@@ -1,0 +1,8 @@
+﻿Group: Payment methods
+FriendlyName: Hepsipay Payment Getway
+SystemName: Hepsipay.Plugin.Payment
+Version: 1.00
+SupportedVersions: 3.90
+Author: Hepsipay Team
+DisplayOrder: 1
+FileName: Hepsipay.Plugin.Payment.dll

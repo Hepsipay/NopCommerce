@@ -1,0 +1,133 @@
+﻿@{
+    Layout = "";
+}
+@model ConfigurationModel
+@using Hepsipay.Plugin.Payment.Models;
+@using Nop.Web.Framework;
+@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ApiUsername_OverrideForStore, model => model.ApiUsername, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ApiUsername):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ApiUsername)
+                @Html.ValidationMessageFor(model => model.ApiUsername)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ApiPassword_OverrideForStore, model => model.ApiPassword, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ApiPassword)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ApiPassword)
+                @Html.ValidationMessageFor(model => model.ApiPassword)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminData">
+                @Html.OverrideStoreCheckboxFor(model => model.ApiEndpoint_OverrideForStore, model => model.ApiEndpoint, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ApiEndpoint)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ApiEndpoint)
+                @Html.ValidationMessageFor(model => model.ApiEndpoint)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.Enable3DSecure_OverrideForStore, model => model.Enable3DSecure, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.Enable3DSecure)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.Enable3DSecure)
+                @Html.ValidationMessageFor(model => model.Enable3DSecure)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.Force3DSecure_OverrideForStore, model => model.Force3DSecure, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.Force3DSecure)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.Force3DSecure)
+                @Html.ValidationMessageFor(model => model.Force3DSecure)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.Force3DForDebit_OverrideForStore, model => model.Force3DForDebit, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.Force3DForDebit)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.Force3DForDebit)
+                @Html.ValidationMessageFor(model => model.Force3DForDebit)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.EnableInstallment_OverrideForStore, model => model.EnableInstallment, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.EnableInstallment)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.EnableInstallment)
+                @Html.ValidationMessageFor(model => model.EnableInstallment)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MerchantPayFees_OverrideForStore, model => model.MerchantPayFees, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MerchantPayFees)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.MerchantPayFees)
+                @Html.ValidationMessageFor(model => model.MerchantPayFees)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.EnableDebugging_OverrideForStore, model => model.EnableDebugging, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.EnableDebugging)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.EnableDebugging)
+                @Html.ValidationMessageFor(model => model.EnableDebugging)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.ServerIP)
+            </td>
+            <td class="adminData">
+                <strong>@Model.ServerIP</strong>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ExtraCss_OverrideForStore, model => model.ExtraCss, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ExtraCss)
+            </td>
+            <td class="adminData">
+                @Html.TextAreaFor(model => model.ExtraCss, new { style = "min-width:50%;min-height:200px" })
+                @Html.ValidationMessageFor(model => model.ExtraCss)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle">
+                &nbsp;
+            </td>
+            <td class="adminData">
+                <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+            </td>
+        </tr>
+    </table>
+}

@@ -1,0 +1,189 @@
+﻿@{
+    Layout = "";
+}
+@model ConfigurationModel
+@using Hepsipay.Plugin.Payment.Models;
+@using Nop.Web.Framework;
+@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.ApiUsername_OverrideForStore, model => model.ApiUsername, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.ApiUsername)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopEditorFor(model => model.ApiUsername)
+                        @Html.ValidationMessageFor(model => model.ApiUsername)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.ApiPassword_OverrideForStore, model => model.ApiPassword, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.ApiPassword)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopEditorFor(model => model.ApiPassword)
+                        @Html.ValidationMessageFor(model => model.ApiPassword)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.ApiEndpoint_OverrideForStore, model => model.ApiEndpoint, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.ApiEndpoint)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopEditorFor(model => model.ApiEndpoint)
+                        @Html.ValidationMessageFor(model => model.ApiEndpoint)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.Enable3DSecure_OverrideForStore, model => model.Enable3DSecure, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.Enable3DSecure)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.Enable3DSecure)
+                        @Html.ValidationMessageFor(model => model.Enable3DSecure)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.Force3DSecure_OverrideForStore, model => model.Force3DSecure, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.Force3DSecure)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.Force3DSecure)
+                        @Html.ValidationMessageFor(model => model.Force3DSecure)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.Force3DForDebit_OverrideForStore, model => model.Force3DForDebit, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.Force3DForDebit)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.Force3DForDebit)
+                        @Html.ValidationMessageFor(model => model.Force3DForDebit)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.EnableInstallment_OverrideForStore, model => model.EnableInstallment, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.EnableInstallment)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.EnableInstallment)
+                        @Html.ValidationMessageFor(model => model.EnableInstallment)
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+        <div class="col-md-3">
+            @Html.OverrideStoreCheckboxFor(model => model.UseDropListInstallment_OverrideForStore, model => model.UseDropListInstallment, Model.ActiveStoreScopeConfiguration)
+            @Html.NopLabelFor(model => model.UseDropListInstallment)
+        </div>
+        <div class="col-md-9">
+            @Html.CheckBoxFor(model => model.UseDropListInstallment)
+            @Html.ValidationMessageFor(model => model.UseDropListInstallment)
+        </div>
+    </div>*@
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.MerchantPayFees_OverrideForStore, model => model.MerchantPayFees, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.MerchantPayFees)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.MerchantPayFees)
+                        @Html.ValidationMessageFor(model => model.MerchantPayFees)
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.Use7SpikesIntegration_OverrideForStore, model => model.Use7SpikesIntegration, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.Use7SpikesIntegration)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.Use7SpikesIntegration)
+                        @Html.ValidationMessageFor(model => model.Use7SpikesIntegration)
+                    </div>
+                </div>*@
+
+                @*<div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.LocalizeCashPaymentOption_OverrideForStore, model => model.LocalizeCashPaymentOption, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.LocalizeCashPaymentOption)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.LocalizeCashPaymentOption)
+                        @Html.ValidationMessageFor(model => model.LocalizeCashPaymentOption)
+                    </div>
+                </div>*@
+
+                @*<div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.CashPaymentLocalizationResource_OverrideForStore, model => model.CashPaymentLocalizationResource, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.CashPaymentLocalizationResource)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(model => model.CashPaymentLocalizationResource, new { @class = "form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.CashPaymentLocalizationResource)
+                    </div>
+                </div>*@
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.EnableDebugging_OverrideForStore, model => model.EnableDebugging, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.EnableDebugging)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.EnableDebugging)
+                        @Html.ValidationMessageFor(model => model.EnableDebugging)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.NopLabelFor(model => model.ServerIP)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopDisplayFor(model => model.ServerIP)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => model.ExtraCss_OverrideForStore, model => model.ExtraCss, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => model.ExtraCss)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopTextAreaFor(model => model.ExtraCss, new { style = "min-width:50%;min-height:200px" })
+                        @Html.ValidationMessageFor(model => model.ExtraCss)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        &nbsp;
+                    </div>
+                    <div class="col-md-9">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

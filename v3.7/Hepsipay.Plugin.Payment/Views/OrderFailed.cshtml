@@ -1,0 +1,38 @@
+@using Nop.Core.Domain.Orders
+@model Order
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //Html.AddTitleParts(T("Hepsipay.Fail").Text);
+}
+
+<div class="page order-details-page">
+    <div class="page-title">
+        <h1>@T("Order.OrderInformation")</h1>
+    </div>
+
+    <div class="page-body">
+        <div class="order-overview">
+            <div class="order-date">
+                @T("Order.OrderDate"): @Model.CreatedOnUtc.ToString("D")
+            </div>
+            <div class="order-status">
+                @T("Order.OrderStatus"): @Model.OrderStatus
+            </div>
+            <div class="order-total">
+                @T("Order.OrderTotal"): <strong>@Model.OrderTotal</strong>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="hepsipay message-error" style="padding: 1em;margin: 20px 0;border: 1px solid;background-color: #FBE6E6;font-size: 1.2em;color: #9C0000;">
+        @T("Hepsipay.FailMessage")
+    </div>
+
+    <div class="page-title">
+        <a href="@Url.RouteUrl("HomePage")" class="button-2  print-order-button">@T("Common.Home")</a>
+    </div>
+
+
+</div>

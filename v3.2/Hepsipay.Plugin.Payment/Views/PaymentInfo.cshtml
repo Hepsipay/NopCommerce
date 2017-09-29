@@ -1,0 +1,227 @@
+﻿@{
+    Layout = "";
+}
+@model Hepsipay.Plugin.Payment.Models.PaymentInfoModel
+@using Nop.Web.Framework;
+@using System.Web.Mvc;
+
+@if (!Model.Settings.UseDropListInstallment)
+{
+    <style>
+        .install_body_label {
+            float: left;
+            width: 30%;
+            height: 40px;
+            text-align: center;
+            border-bottom: 1px solid #d2d2d2;
+            line-height: 40px;
+        }
+
+        .installment_row { /* padding-top: 10px;*/
+        }
+
+        .install_body_label.installment_radio, .installmet_head .install_head_label.add_space {
+            height: 40px;
+            text-align: center;
+            width: 10%;
+            line-height: 40px;
+        }
+
+        #installment_table_id {
+            background-color: #eee;
+            border: 1px solid #d2d2d2;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .installmet_head .install_head_label {
+            float: left;
+            font-weight: bold;
+            text-align: center;
+            width: 30%;
+            height: 40px;
+            line-height: 40px;
+            border-bottom: 2px solid #d2d2d2;
+        }
+
+        .installment_body, .installment_footer {
+            clear: both;
+        }
+
+        .toatl_label {
+            display: none;
+        }
+    </style>
+}
+
+<style>
+    .payment-info .info td input.hepsipay-loading[type="text"] {
+        background-image: url(@Href("~/Plugins/Hepsipay.Plugin.Payment/Content/loading.gif"));
+        background-repeat: no-repeat;
+        background-position-x: 100%;
+        background-position-y: 50%;
+    }
+    @Html.Raw(Model.Settings.ExtraCss)
+
+</style>
+
+<div id="hepsipay-gateway">
+    <table width="100%" cellspacing="2" cellpadding="1" border="0">
+
+
+
+        <tr class="card-image">
+            <td></td>
+            <td>
+                @{
+                    string url = Url.Content("~/Plugins/Hepsipay.Plugin.Payment/Content/Images");
+                    <div class="image-container">
+                        <img id="hepsipay-credit-card-type" data-url="@url/Category/" style="display:none;height:40px" />
+                        <img id="hepsipay-credit-card-network" data-url="@url/Networks/" style="display:none;height:40px" />
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr class="card-holder">
+            <td>
+                @Html.NopLabelFor(model => model.CardholderName, false)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.CardholderName, new {autocomplete = "off" })
+                @Html.ValidationMessageFor(model => model.CardholderName)
+            </td>
+        </tr>
+        <tr class="card-number">
+            <td>
+                @Html.NopLabelFor(model => model.CardNumber, false)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.CardNumber, new {autocomplete = "off", maxlength = 22 })
+                @Html.ValidationMessageFor(model => model.CardNumber)
+            </td>
+        </tr>
+        <tr class="expire-date">
+            <td>
+                @Html.NopLabelFor(model => model.ExpireMonth, false)
+            </td>
+            <td style="position: relative;">
+                @Html.DropDownListFor(model => model.ExpireMonth, Model.ExpireMonths)
+                <span class="slash">/</span>
+                @Html.DropDownListFor(model => model.ExpireYear, Model.ExpireYears)
+            </td>
+        </tr>
+        <tr class="card-cvc">
+            <td>
+                @Html.NopLabelFor(model => model.CardCode, false)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.CardCode, new { style = "width: 77;", autocomplete = "off", maxlength = 4 })
+                @Html.ValidationMessageFor(model => model.CardCode)
+            </td>
+        </tr>
+        @if (Model.Settings.EnableInstallment && Model.Settings.UseDropListInstallment)
+        {
+            <tr id="hepsipay-installment-options" style="display:none" class="installment-options">
+                <td>
+                    @Html.NopLabelFor(model => model.Installment, false)
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.Installment, new List<SelectListItem>() {  }, new { @class = "installment" })
+                    <img id="hepsipay-installment-update" style="display:none;height:32px;margin:0 10px;vertical-align: middle;" src="@Href("~/Plugins/Hepsipay.Plugin.Payment/Content/loading.gif")" alt=""/>
+                    @Html.ValidationMessageFor(model => model.Installment)
+                </td>
+            </tr>
+        }
+        else// if (Model.Settings.EnableInstallment)
+        {
+            <tr id="hepsipay-installment-options" style="display:none" class="installment-options">
+                <td></td>
+                <td>
+                    <p class="form-row installment">
+                        <div id="installment_table_id">
+                            <div class="installmet_head">
+                                <div class="install_head_label add_space"><img style="display: none" class="bank_photo" data-src="<?php echo $bankImagesPath; ?>" src=""></div>
+                                <div class="install_head_label">@T("Hepsipay.InstallmentCount")</div>
+                                <div class="install_head_label">@T("Hepsipay.AmountPerMonth")</div>
+                                <div class="install_head_label">@T("Hepsipay.Payment.Total")</div>
+                            </div>
+                            <div class="installment_body" id="installment_body">
+                                @*installment rows go here *@
+                            </div>
+                            <div class="installment_footer"></div>
+                        </div>
+                    </p>
+                    @Html.ValidationMessageFor(model => model.Installment)
+                </td>
+            </tr>
+        }
+
+        @if (Model.Settings.Enable3DSecure || Model.Settings.Force3DSecure)
+        {
+            <tr id="hepsipay-use3d-row" class="use3d">
+                <td></td>
+                <td>
+                    <label for="@Html.IdFor(model => model.Use3D)">
+                        @if(Model.Settings.Force3DSecure)
+                        {
+                            Model.Use3D = true;
+                            @Html.CheckBoxFor(model => model.Use3D, new { @disabled= true })
+                        }
+                        else
+                        {
+                            @Html.CheckBoxFor(model => model.Use3D)
+                        }
+                        @T("Hepsipay.Field.Use3D")
+                    </label>
+                    @Html.ValidationMessageFor(model => model.Use3D)
+                </td>
+            </tr>
+        }
+
+        @Html.HiddenFor(model => model.Bank)
+        @Html.HiddenFor(model => model.Gateway)
+        @Html.HiddenFor(model => model.Commission)
+    </table>
+</div>
+@{
+    Html.RenderPartial("~/Plugins/Hepsipay.Plugin.Payment/Views/_Hepsipay.Script.cshtml", Model);
+
+    if (Model.Settings.Use7SpikesIntegration)
+    {
+        Html.RenderPartial("~/Plugins/Hepsipay.Plugin.Payment/Views/_SevenSpikes.RealOnePageCheckout.cshtml", null);
+    }
+
+    <script type="text/javascript">
+    (function ($) {
+        hepsipay.run();
+    })(jQuery);
+    </script>
+}
+
+@*<script type="text/javascript">
+        (function ($) {
+            var nopSave = PaymentInfo.save.bind(PaymentInfo);
+
+            PaymentInfo.validate = function () {
+
+            };
+
+            PaymentInfo.save = function () {
+                $.ajax({
+                    cache: false,
+                    url: "@Url.Action("Validate", "Hepsipay")",
+                    data: $(this.form).serialize(),
+                    type: 'post',
+                    success: function (data) {
+                        if (response.error) {
+                            this.nextStep(response);
+                        } else {
+                            nopSave();
+                        }
+                    }.bind(this),
+                    complete: this.resetLoadWaiting,
+                    error: Checkout.ajaxFailure
+                });
+            }
+        })(jQuery);
+    </script>*@

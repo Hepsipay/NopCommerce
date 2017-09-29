@@ -1,0 +1,283 @@
+﻿@model Hepsipay.Plugin.Payment.Models.PaymentInfoModel
+@using Nop.Web.Framework;
+
+<script type="text/javascript">
+    (function ($) {
+        function _round(val) {
+            //return (Math.floor(parseFloat(val) * 100) / 100).toFixed(2);
+            return (Math.round(parseFloat(val) * 100) / 100).toFixed(2);
+        }
+
+        function roundNumber(num, scale) {
+            if (!("" + num).includes("e")) {
+                return +(Math.round(num + "e+" + scale) + "e-" + scale);
+            } else {
+                var arr = ("" + num).split("e");
+                var sig = ""
+                if (+arr[1] + scale > 0) {
+                    sig = "+";
+                }
+                return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+            }
+        }
+
+
+        function _price(value) {
+            return _round(value).toLocaleString();
+        }
+
+        window.hepsipay = {
+            bin: false,
+            banks: [],
+            total: parseFloat("@Model.Total.ToString(System.Globalization.CultureInfo.InvariantCulture)"),
+            currency: "@Model.CurrencySymbol",
+            totalSelector: "",
+            currencyClass: "",
+
+            loadBanks: function () {
+                $.ajax({
+                    url: "@Url.Action("Options", "Hepsipay")",
+                    type: "POST",
+                    data: { command: "banks" },
+                    dataType: "json",
+                    success: function (response) {
+                        hepsipay.banks = response;
+                    }
+                });
+            },
+
+            updateGrandTotal: function (total, currency) {
+                @*$('.hepsipay-grand-total .value').html(_price(total));
+                    //$(this.totalSelector).html('<span clas="'+this.currencyClass+'">'+currency+'</span>&nbsp;'+total);
+                    *@
+            },
+
+            onCardChanged: function (element) {
+
+                var bin = $(element).val().trim().replace(/\s/g, '').substr(0, 6);
+                if (bin == this.bin) { return; }
+                $('#hepsipay-credit-card-type').hide();
+                $('#hepsipay-credit-card-network').hide();
+
+                if (bin.length < 6) {
+                    this.bin = null;
+                    return;
+                }
+                this.bin = bin;
+                var url = '@Url.Action("CardInfo", "Hepsipay")';
+                $(element).addClass("hepsipay-loading");
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: { command: "bin", bin: bin, pan: $(element).val().trim() },
+                    dataType: "json",
+                    success: function (response) {
+                        var bank = (response.BankCode || "UNKNOWN").toLowerCase();
+                        var type = (response.Type || "UNKNOWN").toLowerCase();
+                        var category = (response.Category || "UNKNOWN").toLowerCase();
+                        hepsipay.refreshTakistPlans(response.Installments || []);
+                        $(element).removeClass("hepsipay-loading");
+
+                        var n = (bank + "-" + type).replace(/[\s_]/g, '');
+                        var urlNetwork = $('#hepsipay-credit-card-network').data('url') + n.toLowerCase() + ".png";
+                        $('#hepsipay-credit-card-network').show().attr('src', urlNetwork);
+                        
+                        var urlType = $('#hepsipay-credit-card-type').data('url') + category + ".png";
+                        $('#hepsipay-credit-card-type').show().attr("src", urlType);
+                    },
+                    error: function (response) {
+                        $(element).removeClass("hepsipay-loading");
+                        console.error(response);
+                    }
+                });
+            },
+
+            show3D: function (val) {
+                @if(Model.Settings.Enable3DSecure)
+                    {
+                        <text>
+                val ? $('#hepsipay-use3d-row').show() : $('#hepsipay-use3d-row').hide();
+                if (!val) {
+                    $('#@Html.FieldIdFor(model=>model.Use3D)').prop("checked", false);;
+                }
+                </text>
+                    }
+            },
+
+            payWithTaksit: function (count, bank, gateway, commission) {
+                if (count == 1) {
+                    this.show3D(true);
+                    bank = gateway = '';
+                }
+
+
+                this.showInstallmentLoader(true);
+                hepsipay.updateCommission(bank, count, commission);
+
+                $('#@Html.FieldIdFor(model => model.Installment)').val(count);
+                $('#@Html.FieldIdFor(model => model.Bank)').val(bank);
+                $('#@Html.FieldIdFor(model => model.Gateway)').val(gateway);
+                $('#@Html.FieldIdFor(model => model.Commission)').val(commission);
+                this.showInstallmentLoader(false);
+            },
+
+            payOneShot: function () {
+                this.show3D(true);
+                this.payWithTaksit(1, '', '', 0);
+            },
+
+            getInstallmentOption: function (count, text, amount, commission, currency, has3d, bank, gateway) {
+                var commission = parseFloat(commission);
+                var fee = amount * commission;
+                var total = amount * (1 + commission);
+                var pmon = total / count;
+                var checked = count == 1 ? 'checked' : '';
+                @if(Model.Settings.UseDropListInstallment)
+                    {
+                        <text>
+                return ''
+                    + '<option rel="' + count + '" data-fee="' + _round(fee) + '" data-total="' + _round(total) + '"'
+                    + 'data-has3d="' + has3d + '" data-bank="' + bank + '" data-gateway="' + gateway + '"'
+                    + 'data-commission="' + commission + '"' + 'value="' + count + '">' + text + '</option>'
+                ;
+                </text>
+                    } else
+                    {
+                        <text>
+                return ''
+                    + '<div class="installment_row">'
+                    + '<div class="install_body_label installment_radio">'
+                    + '<input type="radio" class="installment custom_field_installment_radio" rel="' + count + '"'
+                    + ' data-commission="' + commission + '" data-fee="' + _round(fee) + '" data-total="' + _round(total) + '" data-has3d="' + has3d + '"'
+                    + ' data-bank="' + bank + '" data-gateway="' + gateway + '" ' + checked + ' value="' + count + '"'
+                    + ' name="@Html.FieldNameFor(model => model.Installment)"/>'
+                    + '</div>'
+                    + '<div class="install_body_label installment_lable_code">' + text + '</div>'
+                    + '<div class="install_body_label">' + currency + ' ' + _price(pmon) + '</div>'
+                    + '<div class="install_body_label final_commi_price">' + currency + ' ' + _price(total) + '</div>'
+                    + '</div>'
+                ;
+                </text>
+                    }
+            },
+
+            refreshTakistPlans: function (installments) {
+                this.payOneShot();
+                @if (Model.Settings.UseDropListInstallment)
+                    {
+                        <text>var $e = $('#@Html.FieldIdFor(model=>model.Installment)');</text>
+                    }
+                    else
+                    {
+                        <text>var $e = $('#installment_body');</text>
+                    }
+
+                $e.empty();
+                //var optEl = this.getInstallmentOption(1, this.total, 0, this.currency, 1, '', '');
+                //$e.append(optEl);
+                
+                var sumCount = 0;
+                for (var j in installments) {
+                    opt = installments[j];
+                    @if(!Model.Settings.MerchantPayFees)
+                    {
+                        <text>commission = parseFloat(opt.Commission);</text>
+                    }
+                    countText = opt.Count;
+                    @if (Model.Settings.UseDropListInstallment)
+                    {
+                        <text>countText = opt.Count == 1 ? '@T(Model.Settings.CashPaymentLocalizationResource)' : opt.Count;</text>
+                    }
+
+                    // t = Math.round(this.total * (1 + commission));
+                    optEl = this.getInstallmentOption(opt.Count, countText, this.total, commission, this.currency, true, "", "");
+                    $e.append(optEl);
+                    sumCount += opt.Count;
+                }
+
+                if (sumCount > 1 || true) {
+                    $('#hepsipay-installment-options').show();
+                } else {
+                    $('#hepsipay-installment-options').hide();
+                }
+            },
+
+            showInstallmentLoader: function (show) {
+                if (show) {
+                    $('#hepsipay-installment-update').show();
+                } else {
+                    $('#hepsipay-installment-update').hide();
+                }
+            },
+
+            updateCommission: function (bank_id, installment, commission) {
+                @if (!Model.Settings.MerchantPayFees)
+            {
+                <text>
+                $.ajax({
+                    url: '@Url.Action("UpdateCommission", "Hepsipay")',
+                    type: "POST",
+                    data: { bin: this.bin, installment: installment, bank: bank_id },
+                    dataType: "json",
+                    success: function (response) {
+                        hepsipay.onCommissionUpdated(commission);
+                    }
+                });
+                </text>
+            }
+            },
+
+            onCommissionUpdated: function (value) {
+
+            },
+
+            run: function () {
+                //this.loadBanks();
+                //this.detectCardBrand($('#<?php echo $IDS['pan'] ?>'));
+                $('#@Html.FieldIdFor(model=>model.CardNumber)').keyup(function () {
+                    hepsipay.onCardChanged(this);
+                });
+                this.onCardChanged($('#@Html.FieldIdFor(model=>model.CardNumber)').get(0));
+
+                @if(Model.Settings.UseDropListInstallment)
+                    {
+                        <text>
+                $('body').on("change", 'select.installment', function () {
+                    var count = $(this).val();
+                    var total = $(this).find(':selected').data('total');
+                    var bank = $(this).find(':selected').data('bank');
+                    var gateway = $(this).find(':selected').data('gateway');
+                    var has3d = $(this).find(':selected').data('has3d');
+                    var commission = $(this).find(':selected').data('commission');
+                    hepsipay.payWithTaksit(count, bank, gateway, commission);
+                    hepsipay.show3D(count == 1 || has3d);
+                    hepsipay.updateGrandTotal(total, hepsipay.currency);
+                });
+
+                </text>
+                    }
+                    else
+                    {
+                        <text>
+                $('body').on("change", 'input[type="radio"].installment', function () {
+                    var $el = $(this);
+                    var count = $el.attr('rel');
+                    var total = $el.data('total');
+                    var bank = $el.data('bank');
+                    var gateway = $el.data('gateway');
+                    var has3d = $el.data('has3d');
+                    var commission = $el.data('commission');
+                    hepsipay.payWithTaksit(count, bank, gateway, commission);
+                    hepsipay.show3D(count == 1 || has3d);
+                    hepsipay.updateGrandTotal(total, hepsipay.currency);
+                });
+                </text>
+                    }
+
+                if (this.init) {
+                    this.init();
+                }
+            }
+        };
+    })(jQuery);
+</script>

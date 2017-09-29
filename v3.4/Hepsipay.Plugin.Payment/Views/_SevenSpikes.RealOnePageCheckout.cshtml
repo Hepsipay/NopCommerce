@@ -1,0 +1,13 @@
+﻿<script type="text/javascript">
+    (function ($) {
+        window.hepsipay._commission = 0;
+        window.hepsipay.onCommissionUpdated = function (value) {
+            if (this._commission == value) { return; }
+            this._commission = value;
+            
+            var _app = angular.element('[ng-app^=realOnePageCheckout]');
+            var _rootScope = _app.injector().get("$rootScope");
+            _rootScope.$broadcast("resetOrderTotalData");
+        };
+    })(jQuery);
+</script>
